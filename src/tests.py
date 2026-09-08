@@ -70,13 +70,12 @@ def test_task_manager(repository: TaskRepository):
 
 if __name__ == "__main__":
     filename = "task-cli-test.json"
-    try:
-        os.remove(filename)
-    except FileNotFoundError:
-        pass
 
-    repository = TaskRepository(filename)
-    test_repository(repository=repository)
-    test_task_manager(repository=repository)
+    try:
+        repository = TaskRepository(filename)
+        test_repository(repository=repository)
+        test_task_manager(repository=repository)
+    finally:
+        os.remove(filename)
 
 
