@@ -73,7 +73,7 @@ class TaskRepository:
             return Task.from_json(task_json)
         return task_json
 
-    def retrieve(self, status: TaskStatus | None = None) -> list[Task]:
+    def retrieve(self, status: TaskStatus | None = None) -> dict[str, dict]:
         with open(self.filename, "r") as f:
             data = json.load(f)
         if status:
@@ -91,22 +91,23 @@ class TaskManager:
         self.repository = repository
 
     def _last_task_id(self) -> int:
-        tasks = self.repository.retrieve()
-        last_task: Task = tasks[len(tasks)-1]
-        return last_task.id
+        data = self.repository.retrieve()
+        tasks_ids = [int(task_id) for task_id in data.keys()] or [1]
+        last_id = max(tasks_ids)
+        return last_id
 
-    def create_task(self, description: str) -> None:
-        self.repository.save(
-            Task(
-                id=self._last_task_id()+1,
-                description=description,
-                status=TaskStatus.TODO,
-                createdAt=datetime.now(),
-                updatedAt=datetime.now()
-            )
+    def create_task(self, description: str) -> str:
+        task = Task(
+            id=self._last_task_id()+1,
+            description=description,
+            status=TaskStatus.TODO,
+            createdAt=datetime.now(),
+            updatedAt=datetime.now()
         )
+        self.repository.save(task)
+        return task.id
 
-    def update_task(self, id: int, description: str | None, status: TaskStatus | None) -> None:
+    def update_task(self, id: int, description: str | None = None, status: TaskStatus | None = None) -> None:
         task = self.repository.find(id)
         task.description = description or task.description
         task.status = status or task.status
@@ -116,30 +117,9 @@ class TaskManager:
     def delete_task(self, id: int) -> None:
         self.repository.delete(id)
 
-    def list_tasks(self, status: TaskStatus | None) -> None:
-        tasks = self.repository.retrieve(status)
-        print("ID \t | Description \t | Status \t | CreatedAt \t | UpdatedAt \t |")
-        for task in tasks:
-            print(f"{task.id} | {task.description} | {task.status} | {task.createdAt} | {task.updatedAt} |")
-
-if __name__ == "__main__":
-    filename = "task-cli-test.json"
-
-    # Testes de Banco de Dados
-    repository = TaskRepository(filename)
-
-    ## Teste de Salvamento
-    test_task = Task(id=1, description="tarefa-teste", status=TaskStatus.IN_PROGRESS, createdAt=datetime.now(), updatedAt=datetime.now())
-    repository.save(test_task)
-    found_task = repository.find(1)
-    assert test_task == found_task
-    found_task.status = TaskStatus.DONE
-    repository.save(found_task)
-    found_task = repository.find(1)
-    assert found_task.status == TaskStatus.DONE
-    repository.delete(1)
-    found_task = repository.find(1)
-    assert found_task == None
-
-    # Testes de Unitários
-    ...
+    def list_tasks(self, status: TaskStatus | None = None) -> list[Task]:
+        data = self.repository.retrieve(status)
+        tasks: list[Task] = []
+        for brute_task in data.values():
+            tasks.append(Task.from_json(brute_task))
+        return tasks
