@@ -56,7 +56,7 @@ class TaskRepository:
     def save(self, task: Task) -> None:
         data = self.retrieve()
         with open(self.filename, "w") as f:
-            data[task.id] = task.to_json()
+            data[str(task.id)] = task.to_json()
             json.dump(data, f)
 
     def delete(self, id: int) -> None:
@@ -92,7 +92,7 @@ class TaskManager:
 
     def _last_task_id(self) -> int:
         data = self.repository.retrieve()
-        tasks_ids = [int(task_id) for task_id in data.keys()] or [1]
+        tasks_ids = [int(task_id) for task_id in data.keys()] or [0]
         last_id = max(tasks_ids)
         return last_id
 
@@ -109,6 +109,9 @@ class TaskManager:
 
     def update_task(self, id: int, description: str | None = None, status: TaskStatus | None = None) -> None:
         task = self.repository.find(id)
+        if task is None:
+            return
+
         task.description = description or task.description
         task.status = status or task.status
         task.updatedAt = datetime.now()
