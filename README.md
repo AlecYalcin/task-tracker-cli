@@ -53,7 +53,6 @@ Made with Python, you do not need any virtual environment to run this project. T
 - status(opt.): 'todo', 'in-progress' or 'done', filters the results 
 ```
 
-
 ## Documentation
 
 - [Project Chart](docs/project-chart.md)
