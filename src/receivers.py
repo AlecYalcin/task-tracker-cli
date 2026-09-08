@@ -96,7 +96,7 @@ class TaskManager:
         last_id = max(tasks_ids)
         return last_id
 
-    def create_task(self, description: str) -> str:
+    def create_task(self, description: str) -> int:
         task = Task(
             id=self._last_task_id()+1,
             description=description,
