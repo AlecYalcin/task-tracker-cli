@@ -1,6 +1,6 @@
 # task-tracker-cli
 
-Task Tracker is a simple command line interface (CLI) to track what you need to do, what have you done and what you're currently working on. His purpose is to be a personal project to test programming skills and software engineering process at small applications.
+Task Tracker is a simple command line interface (CLI) to track what you need to do, what have you done and what you're currently working on. His purpose is to be a personal project to test programming skills and software engineering process at small applications. It was made as a part of [roadmap.sh](https://roadmap.sh/projects/task-tracker) challenge.
 
 ## How to Run
 
